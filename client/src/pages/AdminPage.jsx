@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { fetchAdminSettings, updateAdminSettings, clearCache } from "../api/adminApi.js";
+import { fetchAdminSettings, updateAdminSettings, clearCache, addSource, deleteSource } from "../api/adminApi.js";
 
 export function AdminPage({ onBack }) {
   const [settings, setSettings] = useState(null);
   const [status, setStatus] = useState({ type: "", message: "" });
   const [saving, setSaving] = useState(false);
+  const [newSource, setNewSource] = useState({ name: "", url: "" });
+  const [addingSource, setAddingSource] = useState(false);
 
   useEffect(() => {
     fetchAdminSettings()
@@ -19,6 +21,37 @@ export function AdminPage({ onBack }) {
         : [...s.disabledSources, id];
       return { ...s, disabledSources: disabled };
     });
+  }
+
+  async function handleAddSource(e) {
+    e.preventDefault();
+    setAddingSource(true);
+    setStatus({ type: "", message: "" });
+    try {
+      await addSource(newSource.name.trim(), newSource.url.trim());
+      setNewSource({ name: "", url: "" });
+      // Reload settings so new source appears in list
+      const updated = await fetchAdminSettings();
+      setSettings(updated);
+      setStatus({ type: "success", message: `Source "${newSource.name.trim()}" added. Clear cache to fetch it now.` });
+    } catch (err) {
+      setStatus({ type: "error", message: err.message });
+    } finally {
+      setAddingSource(false);
+    }
+  }
+
+  async function handleDeleteSource(id, name) {
+    if (!window.confirm(`Remove "${name}"? This cannot be undone.`)) return;
+    setStatus({ type: "", message: "" });
+    try {
+      await deleteSource(id);
+      const updated = await fetchAdminSettings();
+      setSettings(updated);
+      setStatus({ type: "success", message: `Source "${name}" removed.` });
+    } catch (err) {
+      setStatus({ type: "error", message: err.message });
+    }
   }
 
   async function handleSave() {
@@ -95,10 +128,43 @@ export function AdminPage({ onBack }) {
                   </label>
                   <span className="source-name">{src.name}</span>
                   <span className="source-kind">{src.kind}</span>
+                  {src.custom && (
+                    <button
+                      type="button"
+                      className="source-delete-btn"
+                      title="Remove source"
+                      onClick={() => handleDeleteSource(src.id, src.name)}
+                    >
+                      ✕
+                    </button>
+                  )}
                 </li>
               );
             })}
           </ul>
+
+          <form className="add-source-form" onSubmit={handleAddSource}>
+            <p className="admin-card-desc" style={{ marginTop: "18px" }}>Add RSS feed</p>
+            <input
+              type="text"
+              placeholder="Display name (e.g. Wired)"
+              value={newSource.name}
+              maxLength={80}
+              required
+              onChange={(e) => setNewSource((s) => ({ ...s, name: e.target.value }))}
+            />
+            <input
+              type="url"
+              placeholder="RSS feed URL (https://…)"
+              value={newSource.url}
+              maxLength={500}
+              required
+              onChange={(e) => setNewSource((s) => ({ ...s, url: e.target.value }))}
+            />
+            <button type="submit" className="admin-btn-primary" disabled={addingSource}>
+              {addingSource ? "Adding…" : "+ Add source"}
+            </button>
+          </form>
         </section>
 
         {/* Feed settings */}

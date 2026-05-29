@@ -14,6 +14,24 @@ export async function updateAdminSettings(settings) {
   return res.json();
 }
 
+export async function addSource(name, url) {
+  const res = await fetch("/api/admin/sources", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, url }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to add source.");
+  return data;
+}
+
+export async function deleteSource(id) {
+  const res = await fetch(`/api/admin/sources/${encodeURIComponent(id)}`, { method: "DELETE" });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to delete source.");
+  return data;
+}
+
 export async function clearCache() {
   const res = await fetch("/api/admin/cache/clear", { method: "POST" });
   if (!res.ok) throw new Error("Failed to clear cache.");

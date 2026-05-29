@@ -17,6 +17,15 @@ const app = express();
 const newsService = new NewsService(createSourceAdapters());
 const chatService = new ChatService(newsService);
 
+// Register any custom sources saved from the admin page
+const { customSources } = (await import("./services/settingsService.js")).getSettings();
+if (customSources?.length) {
+  const { createSourceAdapters: makeAdapters } = await import("./sources/sourceRegistry.js");
+  for (const adapter of makeAdapters(customSources)) {
+    newsService.addAdapter(adapter);
+  }
+}
+
 const chatLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: Number(process.env.CHAT_RATE_LIMIT || 20),

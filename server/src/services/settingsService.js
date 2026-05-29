@@ -5,6 +5,7 @@ const SETTINGS_FILE = join(process.cwd(), "settings.json");
 
 const DEFAULTS = {
   disabledSources: [],
+  customSources: [],
   cacheTtlMs: Number(process.env.CACHE_TTL_MS || 10 * 60 * 1000),
   maxArticles: Number(process.env.MAX_ARTICLES || 120),
   groqModel: process.env.GROQ_MODEL || "llama-3.1-8b-instant",

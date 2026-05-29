@@ -56,6 +56,18 @@ export class NewsService {
     this.cache = null;
   }
 
+  addAdapter(adapter) {
+    // Replace if same id already exists, otherwise append
+    this.adapters = this.adapters.filter((a) => a.source.id !== adapter.source.id);
+    this.adapters.push(adapter);
+    this.cache = null; // invalidate cache so next fetch includes new source
+  }
+
+  removeAdapter(id) {
+    this.adapters = this.adapters.filter((a) => a.source.id !== id);
+    this.cache = null;
+  }
+
   isCacheFresh() {
     return this.cache && Date.now() - this.cache.fetchedAtMs < this.cacheTtlMs;
   }
