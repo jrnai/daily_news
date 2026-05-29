@@ -30,13 +30,14 @@ export function useNews(filters, page = 1, limit = 30) {
     setError("");
 
     try {
-      setData(await refreshNews());
+      await refreshNews();
+      setData(await fetchNews({ ...stableFilters, page, limit }));
     } catch (refreshError) {
       setError(refreshError.message);
     } finally {
       setIsRefreshing(false);
     }
-  }, []);
+  }, [stableFilters, page, limit]);
 
   useEffect(() => {
     load();
