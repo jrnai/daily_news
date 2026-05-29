@@ -1,6 +1,8 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
+import helmet from "helmet";
+import { rateLimit } from "express-rate-limit";
 import { createNewsRouter } from "./routes/newsRoutes.js";
 import { ChatService } from "./services/chatService.js";
 import { NewsService } from "./services/newsService.js";
@@ -11,9 +13,18 @@ const app = express();
 const newsService = new NewsService(createSourceAdapters());
 const chatService = new ChatService(newsService);
 
+const chatLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: Number(process.env.CHAT_RATE_LIMIT || 20),
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests, please slow down." },
+});
+
+app.use(helmet());
 app.use(cors());
-app.use(express.json());
-app.use("/api", createNewsRouter(newsService, chatService));
+app.use(express.json({ limit: "50kb" }));
+app.use("/api", createNewsRouter(newsService, chatService, chatLimiter));
 
 app.get("/healthz", (_req, res) => {
   res.json({ ok: true });

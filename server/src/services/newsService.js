@@ -1,5 +1,5 @@
-const DEFAULT_CACHE_TTL_MS = 10 * 60 * 1000;
-const MAX_ARTICLES = 120;
+const DEFAULT_CACHE_TTL_MS = Number(process.env.CACHE_TTL_MS || 10 * 60 * 1000);
+const MAX_ARTICLES = Number(process.env.MAX_ARTICLES || 120);
 
 function nowIso() {
   return new Date().toISOString();
@@ -140,7 +140,14 @@ export class NewsService {
       await this.refresh();
     }
 
-    const articles = sortArticles(filterArticles(this.cache.articles, options), options.sort).slice(0, MAX_ARTICLES);
+    const page = Math.max(1, options.page || 1);
+    const limit = Math.min(50, Math.max(1, options.limit || 30));
+
+    const filtered = sortArticles(filterArticles(this.cache.articles, options), options.sort);
+    const total = filtered.length;
+    const totalPages = Math.ceil(total / limit);
+    const articles = filtered.slice((page - 1) * limit, page * limit);
+
     const tags = Array.from(new Set(this.cache.articles.flatMap((article) => article.tags))).sort();
     const sources = Array.from(new Set(this.cache.articles.map((article) => article.source))).sort();
 
@@ -148,6 +155,10 @@ export class NewsService {
       articles,
       meta: {
         count: articles.length,
+        total,
+        page,
+        limit,
+        totalPages,
         totalAvailable: this.cache.articles.length,
         fetchedAt: this.cache.fetchedAt,
         stale: this.cache.stale,

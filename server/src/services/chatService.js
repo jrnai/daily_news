@@ -3,9 +3,9 @@
 // them as grounding context to the Groq LLM. The system prompt instructs
 // the model to answer ONLY from the provided articles — no outside knowledge.
 
-const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const GROQ_MODEL = "llama-3.1-8b-instant";
-const TOP_K = 6; // number of articles to inject as context
+const GROQ_API_URL = process.env.GROQ_API_URL || "https://api.groq.com/openai/v1/chat/completions";
+const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.1-8b-instant";
+const TOP_K = Number(process.env.GROQ_TOP_K || 6); // number of articles to inject as context
 const STOP_WORDS = new Set([
   "a", "an", "the", "is", "it", "in", "on", "at", "to", "for",
   "of", "and", "or", "but", "with", "from", "by", "as", "was",

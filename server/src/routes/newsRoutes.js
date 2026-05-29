@@ -1,16 +1,24 @@
 import express from "express";
 
-export function createNewsRouter(newsService, chatService) {
+const VALID_SORTS = new Set(["newest", "top"]);
+const MAX_Q_LENGTH = 200;
+const MAX_PAGE_SIZE = 50;
+const DEFAULT_PAGE_SIZE = 30;
+const MAX_QUESTION_LENGTH = 500;
+
+export function createNewsRouter(newsService, chatService, chatLimiter) {
   const router = express.Router();
 
   router.get("/news", async (req, res, next) => {
     try {
-      const payload = await newsService.getNews({
-        q: req.query.q || "",
-        source: req.query.source || "all",
-        tag: req.query.tag || "all",
-        sort: req.query.sort || "newest"
-      });
+      const q = String(req.query.q || "").slice(0, MAX_Q_LENGTH);
+      const sort = VALID_SORTS.has(req.query.sort) ? req.query.sort : "newest";
+      const source = req.query.source || "all";
+      const tag = req.query.tag || "all";
+      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const limit = Math.min(MAX_PAGE_SIZE, Math.max(1, parseInt(req.query.limit) || DEFAULT_PAGE_SIZE));
+
+      const payload = await newsService.getNews({ q, source, tag, sort, page, limit });
       res.json(payload);
     } catch (error) {
       next(error);
@@ -30,9 +38,9 @@ export function createNewsRouter(newsService, chatService) {
     }
   });
 
-  router.post("/chat", async (req, res, next) => {
+  router.post("/chat", chatLimiter, async (req, res, next) => {
     try {
-      const question = (req.body.question || "").trim();
+      const question = String(req.body.question || "").trim().slice(0, MAX_QUESTION_LENGTH);
       if (!question) {
         return res.status(400).json({ error: "question is required" });
       }
