@@ -4,9 +4,13 @@ import express from "express";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 import { createNewsRouter } from "./routes/newsRoutes.js";
+import { createAdminRouter } from "./routes/adminRoutes.js";
 import { ChatService } from "./services/chatService.js";
 import { NewsService } from "./services/newsService.js";
+import { loadSettings } from "./services/settingsService.js";
 import { createSourceAdapters } from "./sources/sourceRegistry.js";
+
+await loadSettings();
 
 const port = Number(process.env.PORT || 3001);
 const app = express();
@@ -25,6 +29,7 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json({ limit: "50kb" }));
 app.use("/api", createNewsRouter(newsService, chatService, chatLimiter));
+app.use("/api/admin", createAdminRouter(newsService));
 
 app.get("/healthz", (_req, res) => {
   res.json({ ok: true });

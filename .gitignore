@@ -22,6 +22,9 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
+# Admin settings (user-specific, not committed)
+settings.json
+
 # Editor
 .vscode/
 *.swp

@@ -1,5 +1,6 @@
+import { getSettings } from "./settingsService.js";
+
 const DEFAULT_CACHE_TTL_MS = Number(process.env.CACHE_TTL_MS || 10 * 60 * 1000);
-const MAX_ARTICLES = Number(process.env.MAX_ARTICLES || 120);
 
 function nowIso() {
   return new Date().toISOString();
@@ -75,9 +76,17 @@ export class NewsService {
     });
   }
 
+  clearCache() {
+    this.cache = null;
+  }
+
   async refresh() {
+    const { disabledSources, maxArticles } = getSettings();
+    const activeAdapters = this.adapters.filter(
+      (adapter) => !disabledSources.includes(adapter.source.id)
+    );
     const settled = await Promise.allSettled(
-      this.adapters.map(async (adapter) => ({
+      activeAdapters.map(async (adapter) => ({
         source: adapter.source,
         articles: await adapter.fetchArticles()
       }))
@@ -85,7 +94,7 @@ export class NewsService {
 
     const articles = [];
     const sourceStatuses = settled.map((result, index) => {
-      const source = this.adapters[index].source;
+      const source = activeAdapters[index].source;
 
       if (result.status === "fulfilled") {
         articles.push(...result.value.articles);
@@ -109,7 +118,7 @@ export class NewsService {
       };
     });
 
-    const normalized = sortArticles(dedupeArticles(articles)).slice(0, MAX_ARTICLES);
+    const normalized = sortArticles(dedupeArticles(articles)).slice(0, maxArticles);
 
     if (!normalized.length && this.cache?.articles?.length) {
       this.cache = {

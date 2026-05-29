@@ -14,7 +14,7 @@ const initialFilters = {
 
 const PAGE_SIZE = 30;
 
-export function NewsDashboard() {
+export function NewsDashboard({ onAdmin }) {
   const [filters, setFilters] = useState(initialFilters);
   const [page, setPage] = useState(1);
   const { data, error, isLoading, isRefreshing, refresh } = useNews(filters, page, PAGE_SIZE);
@@ -37,6 +37,9 @@ export function NewsDashboard() {
           <strong>{meta?.total ?? 0}</strong>
           <span>stories</span>
         </div>
+        <button type="button" className="admin-link" onClick={onAdmin} title="Admin settings">
+          ⚙
+        </button>
       </header>
 
       <NewsControls

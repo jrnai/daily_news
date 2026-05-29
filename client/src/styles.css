@@ -553,3 +553,246 @@ h1 {
   cursor: default;
 }
 
+/* ── Admin page ───────────────────────────────────────────── */
+
+.admin-link {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #d6d0c4;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #667085;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.admin-link:hover {
+  background: #23313f;
+  color: #ffffff;
+  border-color: #23313f;
+}
+
+.admin-back-btn {
+  height: 42px;
+  padding: 0 18px;
+  border: 1px solid #d6d0c4;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1b1f23;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-back-btn:hover {
+  background: #23313f;
+  color: #ffffff;
+  border-color: #23313f;
+}
+
+.admin-notice {
+  margin: 0 0 20px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #fff9e6;
+  color: #7a5700;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.admin-status {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.admin-status--success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.admin-status--error {
+  background: #ffe3e1;
+  color: #8a1f17;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-card {
+  padding: 20px 22px;
+  border: 1px solid #ded8ca;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.admin-card h2 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+
+.admin-card-desc {
+  margin: 0 0 14px;
+  color: #667085;
+  font-size: 0.82rem;
+}
+
+.source-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.source-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.source-name {
+  flex: 1;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.source-kind {
+  font-size: 0.76rem;
+  color: #9ca3af;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f3f4f6;
+}
+
+/* Toggle switch */
+.toggle-label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.toggle-label input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-track {
+  display: inline-block;
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  background: #d1d5db;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: left 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle-label input:checked + .toggle-track {
+  background: #1f6f8b;
+}
+
+.toggle-label input:checked + .toggle-track .toggle-thumb {
+  left: 19px;
+}
+
+.admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.admin-field:last-child {
+  margin-bottom: 0;
+}
+
+.admin-field span {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #667085;
+  text-transform: uppercase;
+}
+
+.admin-field input {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #d6d0c4;
+  border-radius: 8px;
+  background: #f9f7f2;
+  color: #1b1f23;
+  font-size: 0.9rem;
+}
+
+.admin-field input:focus {
+  outline: 2px solid #1f6f8b;
+  outline-offset: -1px;
+  background: #ffffff;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
+.admin-btn-primary {
+  height: 42px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 8px;
+  background: #23313f;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.admin-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.admin-btn-secondary {
+  height: 42px;
+  padding: 0 20px;
+  border: 1px solid #d6d0c4;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1b1f23;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.admin-btn-secondary:hover {
+  background: #ffe3e1;
+  border-color: #e8a09a;
+  color: #8a1f17;
+}
+

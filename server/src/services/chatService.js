@@ -3,9 +3,9 @@
 // them as grounding context to the Groq LLM. The system prompt instructs
 // the model to answer ONLY from the provided articles — no outside knowledge.
 
+import { getSettings } from "./settingsService.js";
+
 const GROQ_API_URL = process.env.GROQ_API_URL || "https://api.groq.com/openai/v1/chat/completions";
-const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.1-8b-instant";
-const TOP_K = Number(process.env.GROQ_TOP_K || 6); // number of articles to inject as context
 const STOP_WORDS = new Set([
   "a", "an", "the", "is", "it", "in", "on", "at", "to", "for",
   "of", "and", "or", "but", "with", "from", "by", "as", "was",
@@ -38,9 +38,9 @@ function scoreArticle(article, keywords) {
 }
 
 // Pick the TOP_K most relevant articles for the question
-function retrieveContext(articles, question) {
+function retrieveContext(articles, question, topK = 6) {
   const keywords = extractKeywords(question);
-  if (!keywords.length) return articles.slice(0, TOP_K);
+  if (!keywords.length) return articles.slice(0, topK);
 
   const scored = articles
     .map((article) => ({ article, score: scoreArticle(article, keywords) }))
@@ -48,7 +48,7 @@ function retrieveContext(articles, question) {
     .sort((a, b) => b.score - a.score);
 
   // Fall back to recency when nothing matches
-  const selected = scored.length ? scored.slice(0, TOP_K) : articles.slice(0, TOP_K);
+  const selected = scored.length ? scored.slice(0, topK) : articles.slice(0, topK);
   return selected.map(({ article }) => article);
 }
 
@@ -90,7 +90,8 @@ export class ChatService {
       };
     }
 
-    const contextArticles = retrieveContext(articles, question);
+    const { groqModel, topK } = getSettings();
+    const contextArticles = retrieveContext(articles, question, topK);
     const contextBlock = buildContextBlock(contextArticles);
 
     const systemPrompt = [
@@ -112,7 +113,7 @@ export class ChatService {
         Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: GROQ_MODEL,
+        model: groqModel,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: question },
