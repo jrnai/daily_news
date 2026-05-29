@@ -1,26 +1,29 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { fetchNews, refreshNews } from "../api/newsApi.js";
 
-export function useNews(filters) {
+export function useNews(filters, page = 1, limit = 30) {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const stableFilters = useMemo(() => filters, [filters.q, filters.source, filters.tag, filters.sort]);
+  const stableFilters = useMemo(
+    () => filters,
+    [filters.q, filters.source, filters.tag, filters.sort]
+  );
 
   const load = useCallback(async () => {
     setIsLoading(true);
     setError("");
 
     try {
-      setData(await fetchNews(stableFilters));
+      setData(await fetchNews({ ...stableFilters, page, limit }));
     } catch (loadError) {
       setError(loadError.message);
     } finally {
       setIsLoading(false);
     }
-  }, [stableFilters]);
+  }, [stableFilters, page, limit]);
 
   const refresh = useCallback(async () => {
     setIsRefreshing(true);
